@@ -1,46 +1,57 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, FlatList } from "react-native";
 
-import Screen from "../components/Screen";
+import AppText from "../components/AppText";
+import AppActivityIndicator from "../components/AppActivityIndicator";
+import AppButton from "../components/AppButton";
 import Card from "../components/Card";
 import colors from "../config/colors";
+import Screen from "../components/Screen";
+import listingsApi from "../api/listings";
+import routes from "../navigation/routes";
+import useApi from "../hooks/useApi";
 
-const listings = [
-  {
-    id: 1,
-    title: "Red Jacket",
-    price: 100,
-    image: require("../assets/jacket.jpg"),
-  },
-  {
-    id: 1,
-    title: "Couch",
-    price: 1000,
-    image: require("../assets/couch.jpg"),
-  },
-];
+const ListingScreen = ({ navigation }) => {
+  const { data: listings, error, loading, request: loadListings } = useApi(
+    listingsApi.getListings
+  );
 
-const ListingScreen = () => {
+  useEffect(() => {
+    loadListings();
+  }, []);
   return (
-    <Screen style={styles.screen}>
-      <FlatList
-        data={listings}
-        keyExtractor={(item) => item.id.toString}
-        renderItem={({ item }) => (
-          <Card
-            title={item.title}
-            subtitle={"$" + item.price}
-            image={item.image}
-          />
+    <>
+      <AppActivityIndicator visiable={loading} />
+      <Screen style={styles.screen}>
+        {error && (
+          <>
+            <AppText>Couldnt retrieve the listings</AppText>
+            <AppButton title="retry" onPress={loadListings} />
+          </>
         )}
-      />
-    </Screen>
+
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={listings}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Card
+              title={item.title}
+              subtitle={"$" + item.price}
+              imageUrl={item.images[0].url}
+              onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
+              thumbnailUrl={item.images[0].thumbnailUrl}
+            />
+          )}
+        />
+      </Screen>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   screen: {
-    padding: 20,
+    padding: 10,
     backgroundColor: colors.light,
   },
 });

@@ -4,6 +4,7 @@ import Screen from "../components/Screen";
 import Icon from "../components/Icon";
 import { ListItem, ListItemSeparators } from "../components/lists";
 import Colors from "../config/colors";
+import useAuth from "../auth/useAuth";
 
 const menuItems = [
   {
@@ -19,16 +20,19 @@ const menuItems = [
       name: "email",
       backgroundColor: Colors.secondary,
     },
+    targetScreen: "Messages",
   },
 ];
 
-const AccountScreen = () => {
+const AccountScreen = ({ navigation }) => {
+  const { user, logOut } = useAuth();
+
   return (
     <Screen style={styles.screen}>
       <View style={styles.container}>
         <ListItem
-          title="Ahmed Mohamed"
-          subtitle="m_rx_22@yahoo.com"
+          title={user.name}
+          subtitle={user.email}
           image={require("../assets/mosh.jpg")}
         />
       </View>
@@ -36,7 +40,7 @@ const AccountScreen = () => {
         <FlatList
           data={menuItems}
           keyExtractor={(item) => {
-            item.title;
+            item.title.toString();
           }}
           renderItem={({ item }) => (
             <ListItem
@@ -47,6 +51,7 @@ const AccountScreen = () => {
                   backgroundColor={item.icon.backgroundColor}
                 />
               }
+              onPress={() => navigation.navigate(item.targetScreen)}
             />
           )}
           ItemSeparatorComponent={ListItemSeparators}
@@ -55,6 +60,7 @@ const AccountScreen = () => {
       <ListItem
         title="Log Out"
         IconComponent={<Icon name="logout" backgroundColor="#ffe66d" />}
+        onPress={() => logOut()}
       />
     </Screen>
   );

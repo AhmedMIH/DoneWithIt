@@ -1,24 +1,45 @@
 import React from "react";
-import { Image, View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+} from "react-native";
+import { Image } from "react-native-expo-image-cache";
 import AppText from "../components/AppText";
 import ListItem from "../components/lists/ListItem";
 import colors from "../config/colors";
-function ListDetailsScreen(props) {
+import ContactSellerForm from "../components/ContactSellerForm";
+
+function ListDetailsScreen({ route }) {
+  const listing = route.params;
+
   return (
-    <View>
-      <Image style={styles.image} source={require("../assets/jacket.jpg")} />
-      <View style={styles.detailsContainer}>
-        <AppText style={styles.title}>Red Jacket foe sale </AppText>
-        <AppText style={styles.subtitle}>$100 </AppText>
-        <View style={styles.userContainer}>
-          <ListItem
-            image={require("../assets/mosh.jpg")}
-            title="Mosh"
-            subtitle="5 Listings"
-          />
+    <KeyboardAvoidingView
+      behavior="position"
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
+    >
+      <View>
+        <Image
+          tint="light"
+          style={styles.image}
+          uri={listing.images[0].url}
+          preview={{ uri: listing.images[0].thumbnailUrl }}
+        />
+        <View style={styles.detailsContainer}>
+          <AppText style={styles.title}>{listing.title}</AppText>
+          <AppText style={styles.subtitle}>{listing.price} </AppText>
+          <View style={styles.userContainer}>
+            <ListItem
+              image={require("../assets/mosh.jpg")}
+              title="Mosh"
+              subtitle="5 Listings"
+            />
+          </View>
+          <ContactSellerForm listing={listing} />
         </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
